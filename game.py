@@ -1,5 +1,6 @@
 import sys
 import numpy as np
+import itertools
 from random import choice  # For demo purposes
 
 print(sys.version)
@@ -46,6 +47,9 @@ class Game:
         return [np.pad(b, pad_width=(0, self.BOARD_HEIGHT - len(b)),
                        mode='constant', constant_values=0) for b in self.board]
 
+    def get_input(self):
+        return list(itertools.chain(*self.get_board()))
+
 
 # Demo below (with random moves)
 players = [0, 2]
@@ -57,4 +61,5 @@ while not g.check_victory(players[turn % 2]):
     g.play_turn(c, player)
     if g.check_end():
         break
+    print(g.get_input())
     turn += 1
