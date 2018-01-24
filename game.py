@@ -1,7 +1,6 @@
 import sys
 import numpy as np
 import itertools
-from random import choice  # For demo purposes
 
 print(sys.version)
 
@@ -11,6 +10,9 @@ class Game:
         self.BOARD_WIDTH = BOARD_WIDTH
         self.BOARD_HEIGHT = BOARD_HEIGHT
         self.board = [[] for column in range(BOARD_WIDTH)]
+
+    def reset(self):
+        self.board = [[] for column in range(self.BOARD_WIDTH)]
 
     def play_turn(self, column, player):
         self.board[column].append(player)
@@ -24,7 +26,7 @@ class Game:
     def check_victory(self, player):
         pattern = str(player) * 4
         diagonals = np.max([self.BOARD_HEIGHT, self.BOARD_WIDTH])
-        space = [np.pad(s, pad_width=(0, diagonals - len(s)), mode='constant', constant_values=1) for s in self.board]
+        space = [np.pad(s, pad_width=(0, diagonals - len(s)), mode='constant', constant_values=0) for s in self.board]
         space = np.matrix(space, dtype=np.int32)
         space_flip = np.fliplr(space)
         print(space)
@@ -47,19 +49,5 @@ class Game:
         return [np.pad(b, pad_width=(0, self.BOARD_HEIGHT - len(b)),
                        mode='constant', constant_values=0) for b in self.board]
 
-    def get_input(self):
+    def get_state(self):
         return list(itertools.chain(*self.get_board()))
-
-
-# Demo below (with random moves)
-players = [0, 2]
-turn = 0
-g = Game()
-while not g.check_victory(players[turn % 2]):
-    player = players[turn % 2]
-    c = choice(range(7))
-    g.play_turn(c, player)
-    if g.check_end():
-        break
-    print(g.get_input())
-    turn += 1
