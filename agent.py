@@ -9,10 +9,11 @@ class Agent:
     def __init__(self, game, player=1, learning_rate=0.001, epsilon=0.05):
         self.learning_rate = learning_rate
         self.model = self._build_model(game)
-        self.player=player
+        self.player = player
         self.epsilon = epsilon
         self.score = 0
-        self.memory = []
+        self.memory_short = []
+        self.memory_long = []
 
     def _build_model(self, game):
         board_size = game.BOARD_WIDTH * game.BOARD_HEIGHT
@@ -40,14 +41,29 @@ class Agent:
         action = np.argmax(act_values[0])
         if np.random.rand() <= self.epsilon:
             action = choice(range(game.BOARD_WIDTH))
-        self.memory.append([state, act_values])
+        self.memory_short.append([state, act_values])
         return action, act_values
 
-    def clear(self):
-        self.memory = []
+    def clear_short(self):
+        self.memory_short = []
 
-    def train(self, actions, labels, epochs=10):
-        self.model.fit(actions, labels, epochs=epochs)
+    def clear_long(self):
+        self.memory_long = []
+
+    def memorise(self, victory: bool):
+        def review(x, v):
+            if v:
+                return x
+            else:
+                return 1 - x
+        self.memory_long += [[state, review(x, victory)] for state, x in self.memory_short]
+        self.clear_short()
+
+    def train(self, epochs=10):
+        states = np.array([x[0] for x in self.memory_long])
+        actions = np.array([x[1][0] for x in self.memory_long])
+        self.model.fit(states, actions, epochs=epochs)
+        self.clear_long()
 
     def save(self, filename):
         self.model.save_weights(filename)

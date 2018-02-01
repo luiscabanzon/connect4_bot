@@ -29,18 +29,20 @@ class Game:
         space = [np.pad(s, pad_width=(0, diagonals - len(s)), mode='constant', constant_values=0) for s in self.board]
         space = np.matrix(space, dtype=np.int32)
         space_flip = np.fliplr(space)
-        print(space)
         for i in range(diagonals * -1, diagonals):
             if pattern in "".join([str(s) for s in space.diagonal(i).tolist()[0]]) \
                     or pattern in "".join([str(s) for s in space_flip.diagonal(i).tolist()[0]]):
+                # print(space)
                 print("Player %s WINS!" % player)
                 return True
         for row in space.tolist():
             if pattern in "".join([str(r) for r in row]):
+                # print(space)
                 print("Player %s WINS!" % player)
                 return True
         for column in space.T.tolist():
             if pattern in "".join([str(c) for c in column]):
+                # print(space)
                 print("Player %s WINS!" % player)
                 return True
         return False
